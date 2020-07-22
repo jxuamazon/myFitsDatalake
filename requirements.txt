@@ -1,0 +1,9 @@
+-e .
+aws_cdk.aws_iam
+aws_cdk.aws_s3
+aws_cdk.aws_lambda
+aws_cdk.aws_s3_notifications
+aws_cdk.custom_resources
+aws_cdk.aws_glue
+aws_cdk.aws_lakeformation
+aws_cdk.aws_lambda_event_source
