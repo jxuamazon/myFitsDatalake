@@ -36,6 +36,9 @@ If you are a Windows platform, you would activate the virtualenv like this:
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
+# after installing all needed packages, run freeze to create the requirements.txt for deployment on another environment
+$ pip freeze > requirements.txt
+# on a new environment 
 $ pip install -r requirements.txt
 ```
 
@@ -60,7 +63,7 @@ command.
 Enjoy!
 
 
-## FIT Datalake Project
+## FITS Datalake Project
 
 ![](images/science_datalake.png)
 
