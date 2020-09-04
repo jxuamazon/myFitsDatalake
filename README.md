@@ -67,6 +67,8 @@ Enjoy!
 
 ![](images/science_datalake.png)
 
+### Create a layer for the lambda function
+
 ```
 $ mkdir resoures_layer
 $ mkdir python
@@ -74,11 +76,20 @@ $ pip install aws_cdk.aws_lambda aws_cdk.aws_s3
 $ pip install astropy --target python
 $ zip -r9 resources_layer/astropy.zip python
 ```
-use resources_layer/astropy.zip to create a new later
-
-Astropy depends on Numpy package, furtunately AWS has a public layer available (arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22)
+use resources_layer/astropy.zip to create a new layer
 
 ```
+        layer_astropy = lambda_.LayerVersion(self, 'AstroFitsioLayer', 
+            code=lambda_.Code.from_asset("resources_layer/astropy.zip"),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_7]
+        )
+       # use an AWS provided layer for numpy
+        layer_numpy = lambda_.LayerVersion.from_layer_version_arn(self, "NumpyLayer", "arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22")
+```
+Astropy depends on Numpy package, furtunately AWS has a public layer available (arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22)
+
+### Deploy the my-fits-datalake stack
+```
 $ cdk list # list stacks
-$ cdk deploy  myfitsdatalakeFitsExtractor64052F10 -y
+$ cdk deploy  my-fits-datalake -y
 ```
