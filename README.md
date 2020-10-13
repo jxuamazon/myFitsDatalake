@@ -17,50 +17,6 @@ This project is built with AWS Cloud Development Kit (CDK) using Python. AWS CDK
 
 Assume you have installed cdk and aws cli on the computer you are working on. For instructions on how to install AWS CDK and AWS cli, please visit https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html and  https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html
 
-
-
-## FITS Datalake Project
-
-### Architecture
-
-![](images/science_datalake.png)
-
-Let's walk through what happens when a FITS file is uploaded to the source bucket
-
-- S3Put Event triggers the header extractor lambda function 
-- FITS header is extracted and saved into a csv file to the destination bucket
-- AWS Glue crawler update the database tables in AWS Glue data catalog
-
-
-The main resources involved in this reference architecture
-1. Amazon S3 bucket - existing source bucket (<fits-source-bucket>) - this is where FITS files are stored or will be added to. You can use folder structure inside the bucket. the folder name and file name of a FITS file will become part of the schema
-2. Amazon S3 bucket - created destination bucket (<fits-destination-bucket>) 
-3. AWS Glue crawer
-4. AWS Glue database and tables in AWS Glue data catalog
-
-
-### Create a layer for the lambda function
-
-```
-$ mkdir resoures_layer
-$ mkdir python
-$ pip install aws_cdk.aws_lambda aws_cdk.aws_s3
-$ pip install astropy --target python
-$ zip -r9 resources_layer/astropy.zip python
-```
-use resources_layer/astropy.zip to create a new layer
-
-```
-        layer_astropy = lambda_.LayerVersion(self, 'AstroFitsioLayer', 
-            code=lambda_.Code.from_asset("resources_layer/astropy.zip"),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_7]
-        )
-       # use an AWS provided layer for numpy
-        layer_numpy = lambda_.LayerVersion.from_layer_version_arn(self, "NumpyLayer", "arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22")
-```
-Astropy depends on Numpy package, furtunately AWS has a public layer available (arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22)
-
-
 ## Build and deploy the FITS Data Lake project
 
 ### Project Structure
@@ -174,3 +130,41 @@ This will "touch" all the existing FITS files in the source bucket.
 
 Create and/or updateing files in the <source_bucket_name> bucket will trigger the header extraction lambda function to create header csv files in the <target_bucket_name>. 
 
+
+## FITS Datalake Project
+
+### Architecture
+
+![](images/science_datalake.png)
+
+Let's walk through what happens when a FITS file is uploaded to the source bucket
+
+- S3PutObject/S3RemoveObject Event triggers the header extractor lambda function <header_extractor_lambda>
+- FITS header is extracted and saved into a csv file to the destination bucket <target_bucket_name>
+- AWS Glue crawler <glue_crawler> updates the database tables in AWS Glue data catalog <glue_database>
+
+
+
+
+## Appendix
+
+### How to Create a layer for the lambda function
+
+```
+$ mkdir resoures_layer
+$ mkdir python
+$ pip install aws_cdk.aws_lambda aws_cdk.aws_s3
+$ pip install astropy --target python
+$ zip -r9 resources_layer/astropy.zip python
+```
+use resources_layer/astropy.zip to create a new layer
+
+```
+        layer_astropy = lambda_.LayerVersion(self, 'AstroFitsioLayer', 
+            code=lambda_.Code.from_asset("resources_layer/astropy.zip"),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_7]
+        )
+       # use an AWS provided layer for numpy
+        layer_numpy = lambda_.LayerVersion.from_layer_version_arn(self, "NumpyLayer", "arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22")
+```
+Astropy depends on Numpy package, furtunately AWS has a public layer available (arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22)
