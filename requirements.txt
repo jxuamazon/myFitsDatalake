@@ -45,7 +45,6 @@ jmespath==0.10.0
 jsii==1.9.0
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
--e git+https://github.com/jxuamazon/myFitsDatalake@92d48cd4eb95151558f20fe4090f93dfde9286cc#egg=my_fits_datalake
 numpy==1.19.0
 publication==0.0.3
 pylint==2.5.3
