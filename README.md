@@ -1,13 +1,13 @@
 
-# Welcome to FITS Data lake project. 
+# Welcome to FITS Data Lake project. 
 
 ## Introduction 
 Flexible Image Transport System (FITS) is the most commonly used file format in astronomy. Each FITS file contains one or more ASCII headers (metadata) and a binary data section as multi-dimensional array or tables. 
 Information about the data itself, such as instrument configuration, observation details, image origin, rize and coordinates, are stored in the headers as key value pairs. 
 
-Self-contained metadata format makes it possible for easy transport and sharing, it also provide challenges on the searchability and managibility of the data, especially when you are working on a large amount of data from different satallites or instruments. 
+Self-contained metadata format makes it possible for easy transport and sharing. It also provides challenges on the searchability and managibility of the data, especially when you are working on a large amount of data from different satallites or instruments. 
 
-Data lake is a centralized data repository, which has gain popularity in recently years as the size of the data grow exponentially in all industries. Unlike traditional data warehouse where high peformance relational database ( can be very expensive at large scale ) are used to store data in a central location and with pre-determined schema, data lake takes advantage of existing storage and centralize data schema in a data catalog. For example, to build a data lake on AWS, you can put structured or unstructed data in Amazon Simple Storage Service (Amazon S3) with different schema, automate an ETL crawler to aggregate the schemas into a fully managed data catalog. Then you can run sql querie against the data catalog and process your data. 
+Data lake is a centralized data repository, which has gain popularity in recently years as the size of the data grow exponentially in all industries. Unlike traditional data warehouse where high peformance relational databases ( can be very expensive at large scale ) are used to store data in a central location and with pre-determined schema, data lake takes advantage of existing storage and centralize data schema in a data catalog. For example, to build a data lake on AWS, you can put structured or unstructed data in Amazon Simple Storage Service (Amazon S3) with different schema, automate an ETL crawler to aggregate the schemas into a fully managed data catalog. Then you can run sql querie against the data catalog and process your data. 
 
 Data lake has been used mostly in data analytics so far. In this solution, however, we will apply the concept and practice of building a serverless data lake in AWS cloud for FITS data. This approach can be applied to most of the scientific data, which containes metadata within or with external attachment of metadata files. 
 
@@ -15,111 +15,8 @@ Data lake has been used mostly in data analytics so far. In this solution, howev
 ## About CDK
 This project is built with AWS Cloud Development Kit (CDK) using Python. AWS CDK is an open source software development framework you can use to build and deploy your cloud infrastrures and application resources using your favorite programming language (as an alternative to using AWS CloudFormation). For more detailed information about AWS CDK, please visit https://aws.amazon.com/cdk/. 
 
-Assume you have installed cdk and aws cli on the computer you are working on. 
+Assume you have installed cdk and aws cli on the computer you are working on. For instructions on how to install AWS CDK and AWS cli, please visit https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html and  https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html
 
-### CDK project basics
-The current fold structure is part of the scaffolding created using the following command. 
-```
-cdk init app --language python
-```
-Project code/test data are added on top 
-<pre>
-project_folder/
-|-- fits_data/                      # sample FITS files
-    |-- fits_samples/
-    |-- hubble_samples/
-    |-- turorials/
-|-- images/
-|-- my_fits_datalake/
-    |-- my_fits_datalake_stack.py   # the FitsDatalakeStack code
-!-- notebooks/                      # test jupyter notebook
-|-- python/                         # astropy package source
-|-- resources/
-    |-- fits_header_extractor       # lambda code for extracting FITS header info
-|-- resources_layer/
-    |-- astropy.zip                 # astropy package zip (zip of the python folder)
-|-- app.py                          # CDK app code
-|-- cdk.json                        # CDK config
-|-- .git/
-|-- .gitignore
-|-- test/
-|-- README.md
-|-- requirements.txt
-|-- setup.py
-|-- source.bat 
-</pre>
-
-#### Virtual environment
-
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the .env
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
-
-To manually create a virtualenv on MacOS and Linux:
-
-```
-$ python3 -m venv .env
-```
-
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
-$ source .env/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .env\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-# after installing all needed packages, run freeze to create the requirements.txt for deployment on another environment
-$ pip freeze > requirements.txt
-# on a new environment 
-$ pip install -r requirements.txt
-```
-
-#### CDK configuration file
-The `cdk.json` file tells the CDK Toolkit how to execute your app when you run `cdk deploy`.
-
-#### Setup project parameters in app.py
-The default project stack name is "my-fits-datalake", which will be used as the name of the CloudFormation template stack name and prefix for many of the resources created. You can change that to whatever you like in app.py
-
-```
-source_bucket_name = "fits-source-bucket"    #This is where your source FITS files are stored or will be stored.
-glue_database_name = "fits_datalake"        #This is the name of the database for the data catalog 
-
-MyFitsDatalakeStack(app, "my-fits-datalake", source_bucket_name=source_bucket_name, glue_database_name=glue_database_name)
-```
-
-There are two prameters you need to set for your own project. Please change them accordingly
-
-#### Synthesize and deploy the project
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-$ cdk deploy  my-fits-datalake -y
-```
-
-#### Additional dependencies
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
-
-#### After your deploy the project
-If you already have FITS files in your fits-source-bucket, run the following aws cli command
-```
-aws s3 cp --recursive --metadata {\"touched\":\"true\"} s3://<fits-source-bucket>/ s3://<fits-source-bucket>/
-```
-This will "touch" all the existing FITS files in the source bucket and trigger the header extraction lambda function to create header csv files in the <fits-destination-bucket>. 
 
 
 ## FITS Datalake Project
@@ -162,3 +59,118 @@ use resources_layer/astropy.zip to create a new layer
         layer_numpy = lambda_.LayerVersion.from_layer_version_arn(self, "NumpyLayer", "arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22")
 ```
 Astropy depends on Numpy package, furtunately AWS has a public layer available (arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python37-SciPy1x:22)
+
+
+## Build and deploy the FITS Data Lake project
+
+### Project Structure
+<pre>
+project_folder/
+|-- fits_data/                      # sample FITS files
+    |-- fits_samples/
+    |-- hubble_samples/
+    |-- turorials/
+|-- images/
+|-- my_fits_datalake/
+    |-- my_fits_datalake_stack.py   # the FitsDatalakeStack code
+!-- notebooks/                      # test jupyter notebook
+|-- python/                         # astropy package source
+|-- resources/
+    |-- fits_header_extractor       # lambda code for extracting FITS header info
+|-- resources_layer/
+    |-- astropy.zip                 # astropy package zip (zip of the python folder)
+|-- app.py                          # CDK app code
+|-- cdk.json                        # CDK config
+|-- .git/
+|-- .gitignore
+|-- test/
+|-- README.md
+|-- requirements.txt
+|-- setup.py
+|-- source.bat 
+</pre>
+
+#### Step 1. Create a virtual environment
+
+This project is set up like a standard Python project. To create the virtualenv it assumes that there is a `python3` (or `python` for Windows) executable in your path with access to the `venv`
+package. 
+
+To create a virtualenv on MacOS and Linux:
+
+```
+$ python3 -m venv .env
+```
+
+After the init process completes and the virtualenv is created, you can use the following
+step to activate your virtualenv.
+
+```
+$ source .env/bin/activate
+```
+
+If you are a Windows platform, you would activate the virtualenv like this:
+
+```
+% .env\Scripts\activate.bat
+```
+
+Once the virtualenv is activated, you can install the required dependencies.
+
+```
+$ pip install -r requirements.txt
+```
+To add additional dependencies, for example other CDK libraries, just add
+them to your `setup.py` file and rerun the `pip install -r requirements.txt`
+command.
+
+#### Step 2. Modify project parameters in app.py
+
+The `cdk.json` file tells the CDK Toolkit how to execute your app when you run `cdk deploy`.
+
+In app.py, there are three parameters you can customize: 
+
+```
+##### Begin customization
+# This is the name of the bucket where your source FITS files are stored or will be stored. The bucket must exist already and must be unique. Must be changed
+source_bucket_name = "<changeme>"
+
+# This is the name of the database for the data catalog, you can leave it as is 
+glue_database_name = "fits_datalake"
+
+# stack id, you can leave as is
+stack_id = "my-fits-datalake"
+###### End customization
+```
+
+#### Step 3. Synthesize and deploy the project
+At this point you can now synthesize the CloudFormation template for this code. The result templates can be viewed in cdk.out (auto generated) folder
+
+```
+$ cdk synth     # this will synthesize the CloudFormation templates
+$ cdk deploy    # this will deploy the tack via CloudFormation
+```
+Main resources created will be ( not including IAM Roles, policies, lambda layers, permissions etc),
+
+| Resource Type | Name | Alias | 
+|---------------|------|-------|
+| S3::Bucket | <stack_id>-fitsstorebucket<guid> | <target_bucket_name> |  
+| Lambda::Function | <stack_id>-FITSHeaderExtractorHandler\<guid\> | <header_extractor_lambda> |
+| Glue::Database | fits_datalake | <glue_database> | <glue_database>
+| Glue::Crawler | fitsdatalakecrawler-\<guid\> | <glue_crawler> |
+
+
+
+#### Step 4. Test your deployment
+If you want to use the test FITS files in the "fits_data/" folder, copy the content of the folder into your <source_bucket_name> bucket
+``` 
+aws s3 cp --recursive fits_data/ s3://<source_bucket_name>/
+```
+
+If you already have FITS files in your <source_bucket_name> bucket, run the following aws cli command
+```
+aws s3 cp --recursive --metadata {\"touched\":\"true\"} s3://<source_bucket_name>/ s3://<source_bucket_name>/
+```
+This will "touch" all the existing FITS files in the source bucket.
+
+Create and/or updateing files in the <source_bucket_name> bucket will trigger the header extraction lambda function to create header csv files in the <target_bucket_name>. 
+
