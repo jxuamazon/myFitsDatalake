@@ -114,6 +114,7 @@ Main resources created will be ( not including IAM Roles, policies, lambda layer
 | Glue::Database | fits_datalake | <glue_database> | <glue_database>
 | Glue::Crawler | fitsdatalakecrawler-\<guid\> | <glue_crawler> |
 
+Subsequent execution of `cdk deploy` will create a CloudFormation stack changeset and only update the existing stack.
 
 
 #### Step 4. Test your deployment

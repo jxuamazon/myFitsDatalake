@@ -121,13 +121,13 @@ class MyFitsDatalakeStack(core.Stack):
         # Step 2. create a database in data catalog
         db=glue_.Database(self, "MyFitsDatabase", database_name=glue_database_name)
 
-        # Step 3. create a crawler named "fitsdatalakecrawler-<hex>", and schedule to run hourly
+        # Step 3. create a crawler named "fitsdatalakecrawler-<hex>", and schedule to run every 15 mins
         # You can change the frequency based on your needs
         # cron schedule format cron(Minutes Hours Day-of-month Month Day-of-week Year) 
         glue_.CfnCrawler(self, "fits-datalake-crawler", 
             database_name= glue_database_name,
             role=glue_role.role_arn,
-            schedule={"ScheduleExpression":"cron(0 * * * ? *)"},
+            schedule={"scheduleExpression":"cron(0/15 * * * ? *)"},
             targets={"s3Targets": [{"path":  target_bucket.bucket_name}]}, 
         )
 
