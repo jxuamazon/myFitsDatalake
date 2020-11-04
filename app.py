@@ -6,7 +6,7 @@ from my_fits_datalake.my_fits_datalake_stack import MyFitsDatalakeStack
 
 ##### Begin customization
 # This is where your source FITS files are stored or will be stored. The bucket must exist already and must be unique
-source_bucket_name = "jxu-fits-datalake"
+source_bucket_name = "<changeme>"
 
 # This is the name of the database for the data catalog 
 glue_database_name = "fits_datalake"
