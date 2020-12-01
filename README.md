@@ -30,11 +30,8 @@ project_folder/
 |-- my_fits_datalake/
     |-- my_fits_datalake_stack.py   # the FitsDatalakeStack code
 !-- notebooks/                      # test jupyter notebook
-|-- python/                         # astropy package source
 |-- resources/
     |-- fits_header_extractor       # lambda code for extracting FITS header info
-|-- resources_layer/
-    |-- astropy.zip                 # astropy package zip (zip of the python folder)
 |-- app.py                          # CDK app code
 |-- cdk.json                        # CDK config
 |-- .git/
